@@ -9,7 +9,7 @@ class ImageGenerationResponse(BaseModel):
     """Response model for successful image generation"""
     success: bool = Field(..., description="Whether the operation was successful")
     message: str = Field(..., description="Status message")
-    output_path: str = Field(..., description="Path to the generated image")
+    image_url: str = Field(..., description="URL to access the generated image")
     filename: str = Field(..., description="Filename of the generated image")
 
 

@@ -1,7 +1,7 @@
 """
 API routes for image generation endpoints.
 """
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import FileResponse
 from typing import Optional
 import os
@@ -22,6 +22,7 @@ image_service = ImageGenerationService()
     }
 )
 async def generate_image(
+    request: Request,
     image: UploadFile = File(..., description="Base image to use for generation"),
     prompt: str = Form(..., description="Text prompt describing the desired output"),
 ):
@@ -53,10 +54,14 @@ async def generate_image(
         # Generate image
         result = await image_service.generate_image(image_content, prompt)
         
+        # Construct the image URL
+        base_url = str(request.base_url).rstrip('/')
+        image_url = f"{base_url}/api/v1/download/{result['filename']}"
+        
         return ImageGenerationResponse(
             success=True,
             message="Image generated successfully",
-            output_path=result["output_path"],
+            image_url=image_url,
             filename=result["filename"]
         )
         
@@ -81,7 +86,12 @@ async def download_image(filename: str):
     return FileResponse(
         path=file_path,
         media_type="image/png",
-        filename=filename
+        filename=filename,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET",
+            "Access-Control-Allow-Headers": "*",
+        }
     )
 
 

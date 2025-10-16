@@ -5,8 +5,12 @@ import os
 from typing import List
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
+
+# Get the project root directory (parent of app directory)
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
@@ -27,8 +31,8 @@ class Settings(BaseSettings):
     # Image Settings
     MAX_IMAGE_SIZE: int = int(os.getenv("MAX_IMAGE_SIZE", "10485760"))  # 10MB
     ALLOWED_EXTENSIONS: List[str] = ["jpg", "jpeg", "png", "webp"]
-    OUTPUT_DIR: str = os.getenv("OUTPUT_DIR", "outputs")
-    UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "uploads")
+    OUTPUT_DIR: str = str(BASE_DIR / os.getenv("OUTPUT_DIR", "outputs"))
+    UPLOAD_DIR: str = str(BASE_DIR / os.getenv("UPLOAD_DIR", "uploads"))
     
     # Gemini Model
     GEMINI_MODEL: str = "gemini-2.5-flash-image"
